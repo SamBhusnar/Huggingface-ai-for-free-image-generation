@@ -1,0 +1,1 @@
+I am stoping thi project because most of api are paid those who claimed free those give limited(~6 to 10,may be am wrong about number but they give very limited access ! ) trial and that is not sufficiant for development or at least making prototype or for indiviual project 

@@ -55,90 +55,31 @@ promptBtn.addEventListener("click", () => {
   promptInput.value = prompt;
   promptInput.focus();
 });
-const apiCallingData = {
-  // simpleModelName:{model:realModelName,ModelUrl:realModelUrl}
-  "FLUX.1-dev": {
-    model: "black-forest-labs/flux-dev",
-    ModelUrl: "https://router.huggingface.co/nebius/v1/images/generations",
-  },
-  "FLUX.1-schnell": {
-    model: "black-forest-labs/flux-schnell",
-    ModelUrl: "https://router.huggingface.co/nebius/v1/images/generations",
-  },
-  "Stable Diffusion XL": {
-    model: "stabilityai/stable-diffusion-xl-base-1.0",
-    ModelUrl: "https://router.huggingface.co/nscale/v1/images/generations",
-  },
+
+const getImageDimensions = (aspectSelect, baseSize = 512) => {
+  const [width, height] = aspectSelect.value.split("/").map(Number);
+  const scaleFactor = baseSize / Math.sqrt(width * height);
+  let calculatedWidth = Math.round(width * scaleFactor);
+  let calculatedHeight = Math.round(height * scaleFactor);
+
+  calculatedWidth = Math.floor(calculatedWidth / 16) * 16;
+  calculatedHeight = Math.floor(calculatedHeight / 16) * 16;
+  return { width: calculatedWidth, height: calculatedHeight };
 };
 const apiData = {
   headers: {
-    Authorization: `Bearer ${process.env.HF_TOKEN}`,
+    Authorization: `Bearer ${Token}`,
     "Content-Type": "application/json",
+    "x-use-cache": "false",
   },
   method: "POST",
-  body: JSON.stringify(data),
+  body: JSON.stringify({
+    inputs: promptInput.value.trim(),
+    parameters: getImageDimensions(aspectSelect),
+  }),
 };
-async function query(data) {
-  const response = await fetch(
-    "https://router.huggingface.co/nscale/v1/images/generations",
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.HF_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify(data),
-    }
-  );
-  const result = await response.blob();
-  return result;
-}
-async function query2(data) {
-  const response = await fetch(
-    "https://router.huggingface.co/nebius/v1/images/generations",
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.HF_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify(data),
-    }
-  );
-  const result = await response.blob();
-  return result;
-}
-async function query3(data) {
-  const response = await fetch(
-    "https://router.huggingface.co/nebius/v1/images/generations"
-  );
-  const result = await response.blob();
-  return result;
-}
-const generateImages = (model, count, aspect, prompt) => {
-  query3({
-    response_format: "b64_json",
-    prompt: '"Astronaut riding a horse"',
-    model: "black-forest-labs/flux-schnell",
-  }).then((response) => {
-    // Use image
-  });
 
-  query2({
-    response_format: "b64_json",
-    prompt: '"Astronaut riding a horse"',
-    model: "black-forest-labs/flux-dev",
-  }).then((response) => {
-    // Use image
-  });
-  query({
-    response_format: "b64_json",
-    prompt: '"' + prompt + '"',
-    model: "stabilityai/stable-diffusion-xl-base-1.0",
-  }).then((response) => {
-    // Use image
-  });
-};
+const generateImages = async (model, count, aspect, prompt) => {};
 // create placeholder card with loading spinner
 const createImageCards = (model, count, aspect, prompt) => {
   gridGallery.innerHTML = "";
